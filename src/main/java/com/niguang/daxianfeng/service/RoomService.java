@@ -28,22 +28,31 @@ public class RoomService {
         Room room = emptyRooms.get(0);
         if (room == null) {
 
-        }else {
+        } else {
             room.addUser(userId);
             emptyRooms.remove(room);
             roomMap.put(room.getRoomId(), room);
         }
-            return room;
+        return room;
     }
 
-    public int joinRoom(Long userId, int roomId) {
+    public int joinRoom(int roomId, long userId) {
         Room room = roomMap.get(roomId);
-        int result = room.addUser(userId);
-        return result;
+        return room.addUser(userId);
     }
 
-    public Map<Integer,Room> getRoomMap(){
+    public Map<Integer, Room> getRoomMap() {
         return roomMap;
+    }
+
+    public int leaveRoom(int roomId, long userId) {
+        Room room = roomMap.get(roomId);
+        if (room.getCurUserCount() - 1 == 0) {
+            emptyRooms.add(room);
+            roomMap.remove(room);
+        }
+        return room.deleteUser(userId);
+
     }
 
 

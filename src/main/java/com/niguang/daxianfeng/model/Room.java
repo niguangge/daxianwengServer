@@ -33,4 +33,21 @@ public class Room {
         return 0;
     }
 
+    public int deleteUser(long userId){
+        if(users.contains(userId)){
+            users.remove(userId);
+            curUserCount--;
+            if(curUserCount!=0){
+               if(ownerId==userId) {
+                   ownerId = users.get(0);
+               }
+            }else{
+                ownerId = 0;
+            }
+            return 1;
+        }
+        return 0;
+    }
+
+
 }

@@ -1,8 +1,6 @@
 package com.niguang.daxianfeng.controller;
 
-import com.niguang.daxianfeng.model.Demo;
 import com.niguang.daxianfeng.model.Room;
-import com.niguang.daxianfeng.service.DemoService;
 import com.niguang.daxianfeng.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -38,9 +36,18 @@ public class RoomController {
     @RequestMapping(value = "joinRoom", method = RequestMethod.POST)
     public @ResponseBody
     int joinRoom(Model model,
+                 HttpServletRequest request,
+                 @RequestParam("userId") Long userId,
+                 @RequestParam("roomId") int roomId) throws Exception {
+        return roomService.joinRoom(roomId, userId);
+    }
+
+    @RequestMapping(value = "leaveRoom", method = RequestMethod.POST)
+    public @ResponseBody
+    int leaveRoom(Model model,
                   HttpServletRequest request,
                   @RequestParam("userId") Long userId,
                   @RequestParam("roomId") int roomId) throws Exception {
-        return roomService.joinRoom(userId, roomId);
+        return roomService.leaveRoom(roomId, userId);
     }
 }
