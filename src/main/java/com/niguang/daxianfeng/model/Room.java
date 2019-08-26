@@ -15,7 +15,11 @@ public class Room {
 
     public Room(int roomId) {
         this.roomId = roomId;
-        this.maxUserCount = 4;
+        init();
+    }
+    
+    private void init() {
+    	this.maxUserCount = 4;
         this.curUserCount = 0;
         this.ownerId = 0;
         this.users = new ArrayList<>();
@@ -30,7 +34,7 @@ public class Room {
             this.users.add(userId);
             return 1;
         }
-        return 0;
+        return -1;
     }
 
     public int deleteUser(long userId){
@@ -48,6 +52,10 @@ public class Room {
         }
         return 0;
     }
+
+	public void clean() {
+		init();
+	}
 
 
 }

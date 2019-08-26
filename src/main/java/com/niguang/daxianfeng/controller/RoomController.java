@@ -50,4 +50,12 @@ public class RoomController {
                   @RequestParam("roomId") int roomId) throws Exception {
         return roomService.leaveRoom(roomId, userId);
     }
+    
+    @RequestMapping(value = "getUserBelong", method = RequestMethod.POST)
+    public @ResponseBody
+    int getUserBelong(Model model,
+                  HttpServletRequest request,
+                  @RequestParam("userId") Long userId) throws Exception {
+        return roomService.getUserBelong(userId);
+    }
 }
