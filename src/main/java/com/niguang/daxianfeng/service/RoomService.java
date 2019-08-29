@@ -83,7 +83,7 @@ public class RoomService {
 		return -1;
 	}
 	
-	public void cleanAllRoom() {
+	public void cleanAllRooms() {
 		init();
 	}
 }
