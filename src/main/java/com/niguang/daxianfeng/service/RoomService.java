@@ -86,4 +86,9 @@ public class RoomService {
 	public void cleanAllRooms() {
 		init();
 	}
+	
+	public int test() {
+		Integer[] dice = DiceService.get("normal");
+		return dice[0];
+	}
 }

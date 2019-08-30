@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 import com.niguang.daxianfeng.ApplicationContextRegister;
+import com.niguang.daxianfeng.service.DiceService;
 import com.niguang.daxianfeng.service.GameService;
 import com.niguang.daxianfeng.service.RoomService;
 
@@ -46,7 +47,6 @@ public class WebSocketServer {
 		String[] params = ro_user.split("-");
 		roomId = Integer.valueOf(params[0]);
 		userId = Integer.valueOf(params[1]);
-//		RoomService roomService = applicationContext.getBean(RoomService.class);
 		RoomService roomService = (RoomService) ApplicationContextRegister.getBean("roomService");
 		roomService.joinRoom(roomId, userId);
 		UserSessions userSessions = new UserSessions(userId, session);
@@ -67,11 +67,13 @@ public class WebSocketServer {
 		String newMessage = "来自于房间" + roomId + "内用户" + userId + "的消息：" + message;
 		JSONObject result = new JSONObject();
 		GameService gameService = (GameService) ApplicationContextRegister.getBean("gameService");
-		String type = gameService.messageHandler(roomId, userId, message, result);
+
+		String type = gameService.websocketHandler(roomId, userId, message, result);
 		for (UserSessions userSessions : rooms.get(roomId)) {
 			if (userSessions.session.isOpen()) {
 				if ("all".equals(type)) {
-					userSessions.session.getBasicRemote().sendText(newMessage);
+					userSessions.session.getBasicRemote().sendText(result.toJSONString());
+//					userSessions.session.getBasicRemote().sendText(newMessage);
 				} else if ("personal".equals(type)) {
 						session.getBasicRemote().sendText(newMessage);
 				}
