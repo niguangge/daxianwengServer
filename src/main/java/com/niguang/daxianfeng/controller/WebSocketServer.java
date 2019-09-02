@@ -61,7 +61,7 @@ public class WebSocketServer {
 	}
 
 	@OnMessage
-	public String onMessage(String message, Session session)
+	public void onMessage(String message, Session session)
 			throws IOException, NoSuchMethodException, SecurityException {
 		System.out.println("当前的sessionId:" + session.getId());
 		String newMessage = "来自于房间" + roomId + "内用户" + userId + "的消息：" + message;
@@ -79,7 +79,7 @@ public class WebSocketServer {
 				}
 			}
 		}
-		return "SUCCESS";
+//		return "SUCCESS";
 	}
 
 	@OnClose

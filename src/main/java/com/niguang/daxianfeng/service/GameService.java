@@ -84,7 +84,7 @@ public class GameService {
 			int diceCur = dice[new Random().nextInt(6)];
 			list.add(diceCur);
 		}
-		result.put("diceNums", list);
+		result.put("diceNums", JSON.toJSONString(list));
 		return result;
 	}
 
