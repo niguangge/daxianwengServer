@@ -25,7 +25,7 @@ public class GameService {
 	public static final String WS_CHANNEL_CHAT = "chat";
 	public static final String WS_PARAMS = "params";
 
-	public String websocketHandler(int roomId, long userId, String message, JSONObject result)
+	public String websocketHandler(int roomId, String userId, String message, JSONObject result)
 			throws NoSuchMethodException, SecurityException {
 		String type = WS_SCOPE_ALL; // 默认为发送给全部
 		JSONObject obj;
@@ -38,6 +38,7 @@ public class GameService {
 		}
 		JSONObject params = JSON.parseObject((String) obj.get(WS_PARAMS));
 		result.put(WS_CHANNEL, obj.get(WS_CHANNEL));
+		result.put(WS_STAGE, obj.get(WS_STAGE));
 		switch (obj.get(WS_STAGE).toString()) {
 		case WS_STAGE_DICE:
 			diceHandler(params, result);
@@ -101,7 +102,7 @@ public class GameService {
 		return result;
 	}
 
-	private JSONObject readyHandler(long userId, JSONObject params, JSONObject result) {
+	private JSONObject readyHandler(String userId, JSONObject params, JSONObject result) {
 		result.put("userId", userId);
 		result.put("hero", params.get("hero"));
 		return result;

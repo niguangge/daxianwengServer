@@ -27,16 +27,16 @@ import com.niguang.daxianfeng.service.RoomService;
 @Component
 public class WebSocketServer {
 
-	private static final Map<Integer, List<UserSessions>> rooms = new HashMap<>();
-	private Integer userId;
+	private static final Map<Integer, List<UserSession>> rooms = new HashMap<>();
+	private String userId;
 
 	private Integer roomId;
 
-	private class UserSessions {
-		public int userId;
+	private class UserSession {
+		public String userId;
 		public Session session;
 
-		public UserSessions(int userId, Session session) {
+		public UserSession(String userId, Session session) {
 			this.userId = userId;
 			this.session = session;
 		}
@@ -46,12 +46,12 @@ public class WebSocketServer {
 	public void onOpen(@PathParam(value = "ro_user") String ro_user, Session session) throws IOException {
 		String[] params = ro_user.split("-");
 		roomId = Integer.valueOf(params[0]);
-		userId = Integer.valueOf(params[1]);
+		userId = params[1];
 		RoomService roomService = (RoomService) ApplicationContextRegister.getBean("roomService");
 		roomService.joinRoom(roomId, userId);
-		UserSessions userSessions = new UserSessions(userId, session);
+		UserSession userSessions = new UserSession(userId, session);
 
-		List<UserSessions> userList = rooms.get(roomId);
+		List<UserSession> userList = rooms.get(roomId);
 		if (null == userList || userList.size() == 0) {
 			userList = new ArrayList<>();
 		}
@@ -69,17 +69,15 @@ public class WebSocketServer {
 		GameService gameService = (GameService) ApplicationContextRegister.getBean("gameService");
 
 		String type = gameService.websocketHandler(roomId, userId, message, result);
-		for (UserSessions userSessions : rooms.get(roomId)) {
+		for (UserSession userSessions : rooms.get(roomId)) {
 			if (userSessions.session.isOpen()) {
 				if ("all".equals(type)) {
 					userSessions.session.getBasicRemote().sendText(result.toJSONString());
-//					userSessions.session.getBasicRemote().sendText(newMessage);
 				} else if ("personal".equals(type)) {
-						session.getBasicRemote().sendText(newMessage);
+					session.getBasicRemote().sendText(newMessage);
 				}
 			}
 		}
-//		return "SUCCESS";
 	}
 
 	@OnClose
