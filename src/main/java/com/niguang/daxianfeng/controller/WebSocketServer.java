@@ -17,20 +17,23 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.niguang.daxianfeng.ApplicationContextRegister;
-import com.niguang.daxianfeng.service.DiceService;
 import com.niguang.daxianfeng.service.GameService;
+import com.niguang.daxianfeng.service.MessageService;
 import com.niguang.daxianfeng.service.RoomService;
 
 @ServerEndpoint("/webSocketServer/{ro_user}")
 @Component
 public class WebSocketServer {
 
-	private static final Map<Integer, List<UserSession>> rooms = new HashMap<>();
+	private static final Map<String, List<UserSession>> rooms = new HashMap<>();
 	private String userId;
-
-	private Integer roomId;
+	private String roomId;
+	private RoomService roomService;
+	private GameService gameService;
+	private MessageService messageService;
 
 	private class UserSession {
 		public String userId;
@@ -45,10 +48,12 @@ public class WebSocketServer {
 	@OnOpen
 	public void onOpen(@PathParam(value = "ro_user") String ro_user, Session session) throws IOException {
 		String[] params = ro_user.split("-");
-		roomId = Integer.valueOf(params[0]);
+		roomId = params[0];
 		userId = params[1];
-		RoomService roomService = (RoomService) ApplicationContextRegister.getBean("roomService");
-		roomService.joinRoom(roomId, userId);
+		roomService = (RoomService) ApplicationContextRegister.getBean("roomService");
+		gameService = (GameService) ApplicationContextRegister.getBean("gameService");
+		messageService = (MessageService) ApplicationContextRegister.getBean("messageService");
+		roomService.joinRoom(Integer.parseInt(roomId), userId);
 		UserSession userSessions = new UserSession(userId, session);
 
 		List<UserSession> userList = rooms.get(roomId);
@@ -57,25 +62,21 @@ public class WebSocketServer {
 		}
 		userList.add(userSessions);
 		rooms.put(roomId, userList);
-		session.getBasicRemote().sendText("玩家" + userId + "已进入房间" + roomId + ",sessionId=" + session.getId());
+		session.getBasicRemote().sendText(messageService.getJoinMsg(userId, roomId));
 	}
 
 	@OnMessage
 	public void onMessage(String message, Session session)
 			throws IOException, NoSuchMethodException, SecurityException {
-		System.out.println("当前的sessionId:" + session.getId());
-		String newMessage = "来自于房间" + roomId + "内用户" + userId + "的消息：" + message;
-		JSONObject result = new JSONObject();
-		GameService gameService = (GameService) ApplicationContextRegister.getBean("gameService");
-
-		String type = gameService.websocketHandler(roomId, userId, message, result);
+		JSONObject msg = JSON.parseObject(message);
+		System.out.println(message);
+		JSONObject params = JSON.parseObject((String) msg.get("params"));
+		params = gameService.websocketHandler(roomId, userId, message);
+		String stage = (String) msg.get("stage");
+		String result = messageService.getMessage(userId, roomId, stage, params);
 		for (UserSession userSessions : rooms.get(roomId)) {
 			if (userSessions.session.isOpen()) {
-				if ("all".equals(type)) {
-					userSessions.session.getBasicRemote().sendText(result.toJSONString());
-				} else if ("personal".equals(type)) {
-					session.getBasicRemote().sendText(newMessage);
-				}
+				userSessions.session.getBasicRemote().sendText(result);
 			}
 		}
 	}
@@ -85,7 +86,7 @@ public class WebSocketServer {
 		System.out.println("玩家" + userId + "已离开房间" + roomId + ",sessionId=" + session.getId());
 		System.out.println("webSocket连接关闭：sessionId:" + session.getId() + "关闭原因是：" + reason.getReasonPhrase() + "code:"
 				+ reason.getCloseCode());
-		session.getBasicRemote().sendText("玩家" + userId + "已离开房间" + roomId + ",sessionId=" + session.getId());
+		session.getBasicRemote().sendText(messageService.getLeaveMsg(userId, roomId));
 	}
 
 	@OnError

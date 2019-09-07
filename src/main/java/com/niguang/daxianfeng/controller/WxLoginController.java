@@ -52,9 +52,10 @@ public class WxLoginController {
 			connection.disconnect();
 
 			System.out.println(result.toString());
+			return result.toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return appId;
+		return null;
 	}
 }

@@ -1,7 +1,5 @@
 package com.niguang.daxianfeng.controller;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,53 +11,38 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.niguang.daxianfeng.model.Room;
+import com.niguang.daxianfeng.model.User;
+import com.niguang.daxianfeng.service.UserService;
 
 @RestController
 @RequestMapping("/user/")
 @CrossOrigin
 public class UserController {
 	@Autowired
-	private UserService userSerive;
+	private UserService userService;
 
-	@RequestMapping(value = "createRoom", method = RequestMethod.POST)
-	public @ResponseBody Room createRoom(Model model, HttpServletRequest request, @RequestParam("userId") String userId)
-			throws Exception {
-		Room room = userSerive.createRoom(userId);
-		return room;
+	@RequestMapping(value = "getUser", method = RequestMethod.GET)
+	public @ResponseBody User addUser(Model model, HttpServletRequest request,
+			@RequestParam(value = "userId", defaultValue = "") String userId,
+			@RequestParam(value = "nickName", defaultValue = "") String nickName) throws Exception {
+		User user = userService.getUserByWxId(userId);
+		if (user == null) {
+			user = userService.createUser(userId, nickName);
+			userService.addUser(user);
+		}
+		return user;
 	}
 
-	@RequestMapping(value = "getRooms", method = RequestMethod.GET)
-	public @ResponseBody Map<Integer, Room> getRooms(Model model, HttpServletRequest request) throws Exception {
-		Map<Integer, Room> map = userSerive.getRoomMap();
-		return map;
-	}
-
-	@RequestMapping(value = "joinRoom", method = RequestMethod.POST)
-	public @ResponseBody int joinRoom(Model model, HttpServletRequest request, @RequestParam("userId") String userId,
-			@RequestParam("roomId") int roomId) throws Exception {
-		return userSerive.joinRoom(roomId, userId);
-	}
-
-	@RequestMapping(value = "leaveRoom", method = RequestMethod.POST)
-	public @ResponseBody int leaveRoom(Model model, HttpServletRequest request, @RequestParam("userId") String userId,
-			@RequestParam("roomId") int roomId) throws Exception {
-		return userSerive.leaveRoom(roomId, userId);
-	}
-
-	@RequestMapping(value = "getUserBelong", method = RequestMethod.POST)
-	public @ResponseBody int getUserBelong(Model model, HttpServletRequest request,
-			@RequestParam("userId") String userId) throws Exception {
-		return userSerive.getUserBelong(userId);
-	}
-
-	@RequestMapping(value = "cleanAllRooms", method = RequestMethod.POST)
-	public @ResponseBody void cleanAllRooms(Model model, HttpServletRequest request) throws Exception {
-		userSerive.cleanAllRooms();
-	}
-
-	@RequestMapping(value = "test", method = RequestMethod.POST)
-	public @ResponseBody int test(Model model, HttpServletRequest request) throws Exception {
-		return userSerive.test();
+	@RequestMapping(value = "addExp", method = RequestMethod.GET)
+	public @ResponseBody User addExp(Model model, HttpServletRequest request,
+			@RequestParam(value = "userId", defaultValue = "") String userId,
+			@RequestParam(value = "exp", defaultValue = "") int exp) throws Exception {
+		User user = userService.getUserByWxId(userId);
+		if (user == null) {
+			return null;
+		} else {
+			userService.addExp(user, exp);
+		}
+		return user;
 	}
 }

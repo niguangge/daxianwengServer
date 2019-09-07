@@ -6,20 +6,19 @@ import lombok.Data;
 
 @Data
 public class User {
-	private String UserId;
-	private String wxID;
+	private String userId;
+	private String wxId;
 	private String nickName;
 	private int level;
 	private int curExp;
 
-	public User(String wxID, String nickName) {
+	public User(String userId, String wxId, String nickName, int level, int curExp) {
 		super();
-		this.wxID = wxID;
-		this.level = 0;
-		this.curExp = 0;
-		this.UserId = UUID.randomUUID().toString().replaceAll("-", "");
+		this.userId = userId;
+		this.wxId = wxId;
 		this.nickName = nickName;
-		System.out.println(UserId);
+		this.level = level;
+		this.curExp = curExp;
 	}
 
 }

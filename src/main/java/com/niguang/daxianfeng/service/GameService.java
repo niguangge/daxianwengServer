@@ -25,37 +25,27 @@ public class GameService {
 	public static final String WS_CHANNEL_CHAT = "chat";
 	public static final String WS_PARAMS = "params";
 
-	public String websocketHandler(int roomId, String userId, String message, JSONObject result)
+	public JSONObject websocketHandler(String roomId, String userId, String message)
 			throws NoSuchMethodException, SecurityException {
 		String type = WS_SCOPE_ALL; // 默认为发送给全部
-		JSONObject obj;
-		if ("test".equals(message)) {
-			obj = getTestJson();
-		} else {
-			System.out.println("from vue:"+message);
-			System.out.println("from server:"+getTestJson().toString());
-			obj = JSON.parseObject(message);
-		}
+		JSONObject obj = JSON.parseObject(message);
 		JSONObject params = JSON.parseObject((String) obj.get(WS_PARAMS));
-		result.put(WS_CHANNEL, obj.get(WS_CHANNEL));
-		result.put(WS_STAGE, obj.get(WS_STAGE));
 		switch (obj.get(WS_STAGE).toString()) {
 		case WS_STAGE_DICE:
-			diceHandler(params, result);
+			diceHandler(params);
 			break;
 		case WS_STAGE_EVENT:
-			eventHandler(params, result);
+			eventHandler(params);
 			break;
 		case WS_STAGE_OPERATION:
-			operationHandler(params, result);
+			operationHandler(params);
 			break;
 		case WS_STAGE_READY:
-			readyHandler(userId, params, result);
+			readyHandler(userId, params);
 			break;
 		default:
-
 		}
-		return type;
+		return params;
 	}
 
 	private JSONObject getTestJson() {
@@ -63,7 +53,7 @@ public class GameService {
 		obj.put(WS_CHANNEL, WS_CHANNEL_SYSTEM);
 		obj.put(WS_STAGE, WS_STAGE_DICE);
 		JSONObject params = new JSONObject();
-		params.put("diceNum","3");
+		params.put("diceNum", "3");
 		List<String> list = new ArrayList<>();
 		list.add(Constant.DICE_NORMAL);
 		list.add(Constant.DICE_MINUS_ONE);
@@ -73,38 +63,32 @@ public class GameService {
 		return obj;
 	}
 
-	private JSONObject diceHandler(JSONObject params, JSONObject result) {
-		List<Integer> list = new ArrayList<>();
+	private void diceHandler(JSONObject params) {
+		List<Integer> diceResult = new ArrayList<>();
 		int diceNum = Integer.parseInt((String) params.get("diceNum"));
 		System.out.println(params.get("diceType"));
-		List<String> diceTypes =  JSON.parseArray(params.get("diceType").toString(), String.class);
+		List<String> diceTypes = JSON.parseArray(params.get("diceType").toString(), String.class);
 		for (int i = 0; i < diceNum; i++) {
 			System.out.println(diceTypes.get(i));
 			Integer[] dice = DiceService.get(diceTypes.get(i));
 			System.out.println(dice);
 			int diceCur = dice[new Random().nextInt(6)];
-			list.add(diceCur);
+			diceResult.add(diceCur);
 		}
-		result.put("diceNums", JSON.toJSONString(list));
-		return result;
+		params.put("diceResult", JSON.toJSONString(diceResult));
 	}
 
-	private JSONObject eventHandler(JSONObject params, JSONObject result) {
-		return result;
+	private void eventHandler(JSONObject params) {
 	}
 
-	private JSONObject operationHandler(JSONObject params, JSONObject result) {
-		return result;
+	private void operationHandler(JSONObject params) {
 	}
 
-	private JSONObject chatHandler(JSONObject object, JSONObject result) {
-		// TODO Auto-generated method stub
-		return result;
+	private void chatHandler(JSONObject object) {
 	}
 
-	private JSONObject readyHandler(String userId, JSONObject params, JSONObject result) {
-		result.put("userId", userId);
-		result.put("hero", params.get("hero"));
-		return result;
+	private void readyHandler(String userId, JSONObject params) {
+		params.put("userId", userId);
+		params.put("hero", params.get("hero"));
 	}
 }
