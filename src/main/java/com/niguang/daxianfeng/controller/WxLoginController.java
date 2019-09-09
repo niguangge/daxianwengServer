@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.niguang.daxianfeng.model.ConfigBeanProp;
-import com.niguang.daxianfeng.model.Room;
 
 @RestController
 @RequestMapping("/wx/")

@@ -51,9 +51,9 @@ public class WebSocketServer {
 		roomId = params[0];
 		userId = params[1];
 		roomService = (RoomService) ApplicationContextRegister.getBean("roomService");
-		gameService = (GameService) ApplicationContextRegister.getBean("gameService");
 		messageService = (MessageService) ApplicationContextRegister.getBean("messageService");
-		roomService.joinRoom(Integer.parseInt(roomId), userId);
+		gameService = (GameService) ApplicationContextRegister.getBean("gameService");
+		int userOrder = roomService.joinRoom(Integer.parseInt(roomId), userId);
 		UserSession userSessions = new UserSession(userId, session);
 
 		List<UserSession> userList = rooms.get(roomId);
@@ -62,7 +62,7 @@ public class WebSocketServer {
 		}
 		userList.add(userSessions);
 		rooms.put(roomId, userList);
-		session.getBasicRemote().sendText(messageService.getJoinMsg(userId, roomId));
+		session.getBasicRemote().sendText(messageService.getJoinMsg(userId, roomId, userOrder));
 	}
 
 	@OnMessage
@@ -70,10 +70,11 @@ public class WebSocketServer {
 			throws IOException, NoSuchMethodException, SecurityException {
 		JSONObject msg = JSON.parseObject(message);
 		System.out.println(message);
-		JSONObject params = JSON.parseObject((String) msg.get("params"));
+		JSONObject params = (JSONObject) msg.get("params");
 		params = gameService.websocketHandler(roomId, userId, message);
-		String stage = (String) msg.get("stage");
+		String stage = msg.get("stage").toString();
 		String result = messageService.getMessage(userId, roomId, stage, params);
+		System.out.println("result is " + result);
 		for (UserSession userSessions : rooms.get(roomId)) {
 			if (userSessions.session.isOpen()) {
 				userSessions.session.getBasicRemote().sendText(result);

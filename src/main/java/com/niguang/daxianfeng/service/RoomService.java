@@ -5,25 +5,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.stereotype.Service;
 
 import com.niguang.daxianfeng.model.Room;
 
 @Service("roomService")
 public class RoomService {
-	private Map<Integer, Room> roomMap;
-	private List<Room> emptyRooms;
+	private Map<Integer, Room> roomMap = new HashMap<>();
+	private List<Room> emptyRooms = new ArrayList<>();
 
 	public RoomService() {
 		init();
 	}
 
+	@PostConstruct
+	// 指定初始化方法
 	private void init() {
 		roomMap = new HashMap<>();
 		emptyRooms = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			Room room = new Room(i);
-			emptyRooms.add(room);
+			//TODO 临时测试
+			if (i == 1) {
+				roomMap.put(1, room);
+			} else {
+				emptyRooms.add(room);
+
+			}
 		}
 	}
 
@@ -33,6 +43,7 @@ public class RoomService {
 			room.addUser(userId);
 			emptyRooms.remove(room);
 			roomMap.put(room.getRoomId(), room);
+			System.out.println(room.getRoomId());
 		}
 		return room;
 	}

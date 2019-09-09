@@ -3,8 +3,6 @@ package com.niguang.daxianfeng.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
-
 import com.niguang.daxianfeng.common.Constant;
 
 public class DiceService {

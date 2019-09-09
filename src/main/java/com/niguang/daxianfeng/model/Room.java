@@ -26,15 +26,15 @@ public class Room {
 	}
 
 	public int addUser(String userId) {
-		if (this.curUserCount < this.maxUserCount) {
-			if (this.curUserCount == 0) {
-				this.ownerId = userId;
+		if (curUserCount < this.maxUserCount) {
+			if (curUserCount == 0) {
+				ownerId = userId;
 			}
-			this.curUserCount++;
-			this.users.add(userId);
-			return 1;
+			users.add(userId);
+			return curUserCount++;
+		} else {
+			return -1;
 		}
-		return -1;
 	}
 
 	public int deleteUser(String userId) {

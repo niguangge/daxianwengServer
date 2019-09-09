@@ -1,7 +1,5 @@
 package com.niguang.daxianfeng.model;
 
-import java.util.UUID;
-
 import lombok.Data;
 
 @Data
