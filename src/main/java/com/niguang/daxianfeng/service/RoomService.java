@@ -27,7 +27,7 @@ public class RoomService {
 		emptyRooms = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			Room room = new Room(i);
-			//TODO 临时测试
+			// TODO 临时测试
 			if (i == 1) {
 				roomMap.put(1, room);
 			} else {
@@ -80,6 +80,11 @@ public class RoomService {
 		return -1;
 	}
 
+	public int getRoomUserCount(int roomId) {
+		Room room = roomMap.get(roomId);
+		return room.getCurUserCount();
+	}
+
 	public int cleanRoom(int roomId) {
 		Room room = roomMap.get(roomId);
 		if (room != null) {
@@ -96,5 +101,16 @@ public class RoomService {
 	public int test() {
 		Integer[] dice = DiceService.get("normal");
 		return dice[0];
+	}
+
+	public List<String> getExistUsers(int roomId, String userId) {
+		Room room = roomMap.get(roomId);
+		List<String> exitsUsers = new ArrayList<>();
+		for (String user : room.getUsers()) {
+			if (!user.equals(userId)) {
+				exitsUsers.add(user);
+			}
+		}
+		return exitsUsers;
 	}
 }

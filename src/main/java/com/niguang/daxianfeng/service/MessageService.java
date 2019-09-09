@@ -35,9 +35,10 @@ public class MessageService {
 
 	}
 
-	public String getJoinMsg(String userId, String roomId, int userOrder) {
+	public String getJoinMsg(String userId, String roomId, int userOrder, List<String> exitsUsers) {
 		JSONObject params = new JSONObject();
 		params.put("userOrder", userOrder);
+		params.put("exitsUsers", exitsUsers);
 		JsonRootBean jsonRootBean = new JsonRootBean("join", userId, roomId, "all", "system", params, null);
 		return JSON.toJSONString(jsonRootBean);
 	}
@@ -84,6 +85,9 @@ public class MessageService {
 	public String getMessage(String userId, String roomId, String stage, JSONObject params) {
 		JsonRootBean jsonRootBean = new JsonRootBean(stage, userId, roomId, "all", "system", params, null);
 		return JSON.toJSONString(jsonRootBean);
+	}
 
+	public String getMessage(String stage) {
+		return getMessage(null, null, stage, null);
 	}
 }

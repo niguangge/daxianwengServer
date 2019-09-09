@@ -54,6 +54,7 @@ public class WebSocketServer {
 		messageService = (MessageService) ApplicationContextRegister.getBean("messageService");
 		gameService = (GameService) ApplicationContextRegister.getBean("gameService");
 		int userOrder = roomService.joinRoom(Integer.parseInt(roomId), userId);
+		List<String> exitsUsers = roomService.getExistUsers(Integer.parseInt(roomId), userId);
 		UserSession userSessions = new UserSession(userId, session);
 
 		List<UserSession> userList = rooms.get(roomId);
@@ -62,7 +63,11 @@ public class WebSocketServer {
 		}
 		userList.add(userSessions);
 		rooms.put(roomId, userList);
-		session.getBasicRemote().sendText(messageService.getJoinMsg(userId, roomId, userOrder));
+		session.getBasicRemote().sendText(messageService.getJoinMsg(userId, roomId, userOrder, exitsUsers));
+		if (roomService.getRoomUserCount(Integer.parseInt(roomId)) == 4) {
+			session.getBasicRemote().sendText(messageService.getMessage("start"));
+
+		}
 	}
 
 	@OnMessage
