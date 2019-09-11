@@ -103,14 +103,9 @@ public class RoomService {
 		return dice[0];
 	}
 
-	public List<String> getExistUsers(int roomId, String userId) {
+	public List<String> getOtherUsers(int roomId, String userId) {
 		Room room = roomMap.get(roomId);
-		List<String> exitsUsers = new ArrayList<>();
-		for (String user : room.getUsers()) {
-			if (!user.equals(userId)) {
-				exitsUsers.add(user);
-			}
-		}
-		return exitsUsers;
+		System.out.println(room);
+		return room.getUsers();
 	}
 }
