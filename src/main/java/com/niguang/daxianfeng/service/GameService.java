@@ -31,7 +31,7 @@ public class GameService {
 		switch (obj.get(WS_STAGE).toString()) {
 		case WS_STAGE_DICE:
 			diceHandler(params);
-			eventHandler(params);
+//			eventHandler(params);
 			break;
 		case WS_STAGE_OPERATION:
 			operationHandler(params);
@@ -47,13 +47,10 @@ public class GameService {
 	private void diceHandler(JSONObject params) {
 		List<Integer> diceResult = new ArrayList<>();
 		int diceNum = Integer.parseInt((String) params.get("diceNums"));
-		System.out.println(params.get("diceTypes"));
 		List<String> diceTypes = JSON.parseArray(params.get("diceTypes").toString(), String.class);
 		int diceSum = 0;
 		for (int i = 0; i < diceNum; i++) {
-			System.out.println(diceTypes.get(i));
 			Integer[] dice = DiceService.get(diceTypes.get(i));
-			System.out.println(dice);
 			int diceCur = dice[new Random().nextInt(6)];
 			diceResult.add(diceCur);
 			diceSum += diceCur;

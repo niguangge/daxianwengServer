@@ -87,7 +87,9 @@ public class MessageService {
 		return JSON.toJSONString(jsonRootBean);
 	}
 
-	public String getMessage(String stage) {
-		return getMessage(null, null, stage, null);
+	public String getMessage(String stage, List<User> userDetails) {
+		JSONObject params = new JSONObject();
+		params.put("userDetails", userDetails);
+		return getMessage(null, null, stage, params);
 	}
 }

@@ -16,23 +16,10 @@ public class RoomController {
 	@Autowired
 	private RoomService roomService;
 
-	@RequestMapping(value = "createRoom", method = RequestMethod.POST)
-	public @ResponseBody Room createRoom(Model model, HttpServletRequest request, @RequestParam("userId") String userId)
-			throws Exception {
-		Room room = roomService.createRoom(userId);
-		return room;
-	}
-
 	@RequestMapping(value = "getRooms", method = RequestMethod.GET)
 	public @ResponseBody Map<Integer, Room> getRooms(Model model, HttpServletRequest request) throws Exception {
 		Map<Integer, Room> map = roomService.getRoomMap();
 		return map;
-	}
-
-	@RequestMapping(value = "joinRoom", method = RequestMethod.POST)
-	public @ResponseBody int joinRoom(Model model, HttpServletRequest request, @RequestParam("userId") String userId,
-			@RequestParam("roomId") int roomId) throws Exception {
-		return roomService.joinRoom(roomId, userId);
 	}
 
 	@RequestMapping(value = "leaveRoom", method = RequestMethod.POST)
@@ -42,8 +29,8 @@ public class RoomController {
 	}
 
 	@RequestMapping(value = "getUserBelong", method = RequestMethod.POST)
-	public @ResponseBody int getUserBelong(Model model, HttpServletRequest request, @RequestParam("userId") String userId)
-			throws Exception {
+	public @ResponseBody int getUserBelong(Model model, HttpServletRequest request,
+			@RequestParam("userId") String userId) throws Exception {
 		return roomService.getUserBelong(userId);
 	}
 
@@ -51,7 +38,7 @@ public class RoomController {
 	public @ResponseBody void cleanAllRooms(Model model, HttpServletRequest request) throws Exception {
 		roomService.cleanAllRooms();
 	}
-	
+
 	@RequestMapping(value = "test", method = RequestMethod.POST)
 	public @ResponseBody int test(Model model, HttpServletRequest request) throws Exception {
 		return roomService.test();

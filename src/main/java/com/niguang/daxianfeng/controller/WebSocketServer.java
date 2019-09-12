@@ -2,9 +2,7 @@ package com.niguang.daxianfeng.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
@@ -12,7 +10,6 @@ import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 import org.springframework.stereotype.Component;
@@ -29,8 +26,6 @@ import com.niguang.daxianfeng.service.UserService;
 @ServerEndpoint("/webSocketServer")
 @Component
 public class WebSocketServer {
-
-	private static final Map<String, List<UserSession>> allSessions = new HashMap<>();
 	private String userId;
 	private String roomId;
 	private RoomService roomService;
@@ -38,38 +33,23 @@ public class WebSocketServer {
 	private MessageService messageService;
 	private UserService userService;
 
-	private class UserSession {
-		public String userId;
-		public Session session;
-
-		public UserSession(String userId, Session session) {
-			this.userId = userId;
-			this.session = session;
-		}
-	}
-
 	@OnOpen
 	public void onOpen(Session session) throws IOException {
-		initSessionList(session);
+		initParams(session);
 		initServices();
-		roomService.joinRoom(Integer.parseInt(roomId), userId);
-		List<User> userInfos = getExistUsers();
-		session.getBasicRemote().sendText(messageService.getJoinMsg(userId, roomId, userInfos));
-		if (roomService.getRoomUserCount(Integer.parseInt(roomId)) == 2) {
-			boardToRoomUsers(messageService.getMessage("start"));
-
+		int roomUserCount = roomService.joinRoom(Integer.parseInt(roomId), userId, session);
+		if (roomUserCount == 2) {
+			List<User> userDetails = getExistUserDedails(session);
+			String msg = messageService.getMessage("start", userDetails);
+			boardToRoomUsers(msg);
 		}
 	}
 
 	@OnMessage
 	public void onMessage(String message, Session session)
 			throws IOException, NoSuchMethodException, SecurityException {
-		String result = getResult(message);
-		for (UserSession userSessions : allSessions.get(roomId)) {
-			if (userSessions.session.isOpen()) {
-				userSessions.session.getBasicRemote().sendText(result);
-			}
-		}
+		String result = getHandleResult(message);
+		boardToRoomUsers(result);
 	}
 
 	@OnClose
@@ -85,17 +65,9 @@ public class WebSocketServer {
 		t.printStackTrace();
 	}
 
-	private void initSessionList(Session session) {
+	private void initParams(Session session) {
 		roomId = session.getRequestParameterMap().get("roomId").get(0);
-		// 坑爹的微信居然openId里还有-中划线
 		userId = session.getRequestParameterMap().get("userId").get(0);
-		UserSession userSession = new UserSession(userId, session);
-		List<UserSession> userSessionsInRoom = allSessions.get(roomId);
-		if (null == userSessionsInRoom || userSessionsInRoom.size() == 0) {
-			userSessionsInRoom = new ArrayList<>();
-		}
-		userSessionsInRoom.add(userSession);
-		allSessions.put(roomId, userSessionsInRoom);
 	}
 
 	public void initServices() {
@@ -105,18 +77,17 @@ public class WebSocketServer {
 		userService = (UserService) ApplicationContextRegister.getBean("userService");
 	}
 
-	public List<User> getExistUsers() {
-		List<String> existUsers = roomService.getOtherUsers(Integer.parseInt(roomId), userId);
+	public List<User> getExistUserDedails(Session session) throws IOException {
+		List<String> existUsers = roomService.getExistUsers(Integer.parseInt(roomId));
 		List<User> userInfos = new ArrayList<>();
 		for (int i = 0; i < existUsers.size(); i++) {
 			String existUserId = existUsers.get(i);
 			userInfos.add(userService.getUserByWxId(existUserId));
 		}
 		return userInfos;
-
 	}
 
-	private String getResult(String message) throws NoSuchMethodException, SecurityException {
+	private String getHandleResult(String message) throws NoSuchMethodException, SecurityException {
 		JSONObject msg = JSON.parseObject(message);
 		JSONObject params = (JSONObject) msg.get("params");
 		params = gameService.websocketHandler(roomId, userId, message);
@@ -125,10 +96,6 @@ public class WebSocketServer {
 	}
 
 	private void boardToRoomUsers(String msg) throws IOException {
-		for (UserSession userSessions : allSessions.get(roomId)) {
-			if (userSessions.session.isOpen()) {
-				userSessions.session.getBasicRemote().sendText(msg);
-			}
-		}
+		roomService.boardToRoomUsers(Integer.parseInt(roomId), msg);
 	}
 }
