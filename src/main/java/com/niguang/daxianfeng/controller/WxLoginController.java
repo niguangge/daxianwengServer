@@ -33,15 +33,12 @@ public class WxLoginController {
 		String uri = String.format(
 				"https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
 				appId, secret, code);
-		System.out.println("uri is " + uri);
 		try {
 			URL url = new URL(uri);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
 			connection.setDoOutput(true); // 设置该连接是可以输出的
 			connection.setRequestMethod("GET"); // 设置请求方式
 			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-
 			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
 			String line = null;
 			StringBuilder result = new StringBuilder();
@@ -49,8 +46,6 @@ public class WxLoginController {
 				result.append(line + "\n");
 			}
 			connection.disconnect();
-
-			System.out.println(result.toString());
 			return result.toString();
 		} catch (Exception e) {
 			e.printStackTrace();

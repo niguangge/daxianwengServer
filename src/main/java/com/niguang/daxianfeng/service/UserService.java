@@ -23,10 +23,10 @@ public class UserService {
 		expMulti = 1;
 	}
 
-	public User createUser(String wxId, String nickName) {
+	public User createUser(String wxId, String nickName, String avatarUrl) {
 		if (wxId != null && !wxId.equals("")) {
 			String userId = UUID.randomUUID().toString().replaceAll("-", "");
-			User user = new User(userId, wxId, nickName, 0, 0);
+			User user = new User(userId, wxId, nickName, 0, 0, avatarUrl);
 			return user;
 		} else {
 			return null;
@@ -59,5 +59,11 @@ public class UserService {
 		}
 		user.setLevel(level);
 		return level;
+	}
+
+	public void updateUser(User user, String wxId, String nickName, String avatarUrl) {
+		if (user.getUserId() != wxId || user.getNickName() != nickName || user.getAvatarUrl() != avatarUrl) {
+			userMapper.updateNameAndAvatarUrl(wxId, nickName, avatarUrl);
+		}
 	}
 }

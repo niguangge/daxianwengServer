@@ -21,4 +21,8 @@ public interface UserMapper {
 	@Update("UPDATE user SET cur_exp=#{exp} ,level=#{level} WHERE wx_id=#{wxId};")
 	public int addExp(@Param("wxId") String wxId, @Param("exp") int exp, @Param("level") int level);
 
+	@Update("UPDATE user SET nick_name=#{nickName} ,avatar_url=#{avatarUrl} WHERE wx_id=#{wxId};")
+	public int updateNameAndAvatarUrl(@Param("wxId") String wxId, @Param("nickName") String nickName,
+			@Param("avatarUrl") String avatarUrl);
+
 }

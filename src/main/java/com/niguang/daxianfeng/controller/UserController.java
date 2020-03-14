@@ -24,11 +24,14 @@ public class UserController {
 	@RequestMapping(value = "getUser", method = RequestMethod.GET)
 	public @ResponseBody User addUser(Model model, HttpServletRequest request,
 			@RequestParam(value = "userId", defaultValue = "") String userId,
+			@RequestParam(value = "avatarUrl", defaultValue = "") String avatarUrl,
 			@RequestParam(value = "nickName", defaultValue = "") String nickName) throws Exception {
 		User user = userService.getUserByWxId(userId);
 		if (user == null) {
-			user = userService.createUser(userId, nickName);
+			user = userService.createUser(userId, nickName, avatarUrl);
 			userService.addUser(user);
+		} else {
+			userService.updateUser(user, userId, nickName, avatarUrl);
 		}
 		return user;
 	}
@@ -45,4 +48,5 @@ public class UserController {
 		}
 		return user;
 	}
+
 }

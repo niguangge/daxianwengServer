@@ -11,11 +11,15 @@ import lombok.Data;
 
 @Data
 public class Room {
+	// 与数据库对应属性
 	private int roomId;
 	private int maxUserCount;
 	private int curUserCount;
 	private String ownerId;
 	private List<String> users;
+
+	// outBean所需属性
+	private List<User> userDetails;
 	private Map<String, Session> userSessions;
 
 	public Room(int roomId) {

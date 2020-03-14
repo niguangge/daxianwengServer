@@ -38,9 +38,4 @@ public class RoomController {
 	public @ResponseBody void cleanAllRooms(Model model, HttpServletRequest request) throws Exception {
 		roomService.cleanAllRooms();
 	}
-
-	@RequestMapping(value = "test", method = RequestMethod.POST)
-	public @ResponseBody int test(Model model, HttpServletRequest request) throws Exception {
-		return roomService.test();
-	}
 }
